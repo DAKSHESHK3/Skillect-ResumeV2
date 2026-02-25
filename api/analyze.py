@@ -1,18 +1,27 @@
-import json
 from llm.router import run_all_models
 from llm.consensus import consensus
+from http.server import BaseHTTPRequestHandler
+import json
+import asyncio
 
-async def handler(request):
+class handler(BaseHTTPRequestHandler):
 
-    body = await request.json()
+    def do_POST(self):
 
-    prompt = body.get("resume")
+        content_length = int(self.headers.get('Content-Length', 0))
+        body = self.rfile.read(content_length)
+        data = json.loads(body)
 
-    results = await run_all_models(prompt)
+        prompt = data.get("resume")
 
-    final = consensus(results)
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
 
-    return {
-        "statusCode":200,
-        "body":json.dumps(final)
-    }
+        results = loop.run_until_complete(run_all_models(prompt))
+        final = consensus(results)
+
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json')
+        self.end_headers()
+
+        self.wfile.write(json.dumps(final).encode())

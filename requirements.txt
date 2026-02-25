@@ -1,2 +1,6 @@
+<<<<<<< HEAD
 google-generativeai
+=======
+google-generativeai
+>>>>>>> f8c1ac8 (fix vercel python function)
 httpx
