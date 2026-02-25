@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Resume.AI — Career Intelligence Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08080f;--panel:#0f0f1a;--border:#1c1c2e;
+  --green:#00e5a0;--blue:#3b82f6;--yellow:#f5c542;--red:#ff5e5e;
+  --text:#e2e2e2;--muted:#4a4a6a;--dim:#222238;
+  --input-bg:#0a0a15;--input-border:#1c1c2e;
+}
+[data-theme="light"]{
+  --bg:#f0f2f8;--panel:#ffffff;--border:#dde1ee;
+  --green:#00b37a;--blue:#2563eb;--yellow:#d97706;--red:#dc2626;
+  --text:#1a1a2e;--muted:#6b7280;--dim:#e5e7eb;
+  --input-bg:#f8faff;--input-border:#cbd5e1;
+}
+body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh;transition:background .4s,color .4s}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* HEADER */
+header{border-bottom:1px solid var(--border);padding:16px 40px;display:flex;align-items:center;gap:14px;background:var(--bg);position:sticky;top:0;z-index:100;transition:background .4s,border .4s}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--green),var(--blue));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.logo-title{font-size:18px;font-weight:700;letter-spacing:3px;color:var(--text);font-family:'Syne',sans-serif}
+.logo-sub{font-size:10px;color:var(--muted);letter-spacing:3px}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:20px}
+.powered{font-size:10px;color:var(--muted);letter-spacing:2px}
+
+/* THEME TOGGLE */
+.switch{position:relative;display:inline-block;width:60px;height:34px}
+.switch #toggle-input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#1a1a2e;transition:.4s;z-index:0;overflow:hidden}
+.sun-moon{position:absolute;height:26px;width:26px;left:4px;bottom:4px;background-color:white;transition:.4s}
+#toggle-input:checked + .slider{background-color:#2196f3}
+#toggle-input:checked + .slider .sun-moon{transform:translateX(26px);background-color:yellow;animation:rotate-center .6s ease-in-out both}
+@keyframes rotate-center{0%{transform:translateX(26px) rotate(0)}100%{transform:translateX(26px) rotate(360deg)}}
+.moon-dot{opacity:1;transition:.4s;fill:gray}
+#toggle-input:checked + .slider .sun-moon .moon-dot{opacity:0}
+.slider.round{border-radius:34px}.slider.round .sun-moon{border-radius:50%}
+#moon-dot-1{left:10px;top:3px;position:absolute;width:6px;height:6px;z-index:4}
+#moon-dot-2{left:2px;top:10px;position:absolute;width:10px;height:10px;z-index:4}
+#moon-dot-3{left:16px;top:18px;position:absolute;width:3px;height:3px;z-index:4}
+#light-ray-1{left:-8px;top:-8px;position:absolute;width:43px;height:43px;z-index:-1;fill:white;opacity:.1}
+#light-ray-2{left:-50%;top:-50%;position:absolute;width:55px;height:55px;z-index:-1;fill:white;opacity:.1}
+#light-ray-3{left:-18px;top:-18px;position:absolute;width:60px;height:60px;z-index:-1;fill:white;opacity:.1}
+.cloud-light{position:absolute;fill:#eee;animation:cloud-move 6s infinite}
+.cloud-dark{position:absolute;fill:#ccc;animation:cloud-move 6s infinite;animation-delay:1s}
+#cloud-1{left:30px;top:15px;width:40px}#cloud-2{left:44px;top:10px;width:20px}#cloud-3{left:18px;top:24px;width:30px}
+#cloud-4{left:36px;top:18px;width:40px}#cloud-5{left:48px;top:14px;width:20px}#cloud-6{left:22px;top:26px;width:30px}
+@keyframes cloud-move{0%{transform:translateX(0)}40%{transform:translateX(4px)}80%{transform:translateX(-4px)}100%{transform:translateX(0)}}
+.stars{transform:translateY(0);opacity:1;transition:.4s}
+.star{fill:white;position:absolute;transition:.4s;animation:star-twinkle 2s infinite}
+#toggle-input:checked + .slider .stars{transform:translateY(-32px);opacity:0}
+#star-1{width:20px;top:2px;left:3px;animation-delay:.3s}#star-2{width:6px;top:16px;left:3px}
+#star-3{width:12px;top:20px;left:10px;animation-delay:.6s}#star-4{width:18px;top:0;left:18px;animation-delay:1.3s}
+@keyframes star-twinkle{0%{transform:scale(1)}40%{transform:scale(1.2)}80%{transform:scale(.8)}100%{transform:scale(1)}}
+
+main{max-width:1080px;margin:0 auto;padding:48px 20px}
+
+/* UPLOAD */
+#upload-section{text-align:center}
+h1{font-size:clamp(28px,5vw,52px);font-weight:900;color:var(--text);letter-spacing:-1px;line-height:1.1;margin-bottom:12px;font-family:'Syne',sans-serif}
+h1 span{color:var(--green)}
+.subtitle{color:var(--muted);font-size:14px;margin-bottom:40px}
+#dropzone{border:2px dashed var(--border);border-radius:16px;padding:56px 32px;cursor:pointer;background:transparent;transition:all .2s;max-width:520px;margin:0 auto 20px}
+#dropzone:hover,#dropzone.drag{border-color:var(--green);background:rgba(0,229,160,0.04)}
+#dropzone.has-file{border-color:var(--blue);border-style:solid}
+.dz-icon{font-size:44px;margin-bottom:14px}
+.dz-text{font-size:15px;color:var(--muted)}
+.dz-hint{font-size:11px;color:var(--muted);margin-top:6px}
+#file-input{display:none}
+
+/* PROVIDER BAR */
+.provider-bar{display:flex;align-items:center;gap:10px;max-width:620px;margin:0 auto 20px;flex-wrap:wrap;justify-content:center}
+.provider-label{font-size:10px;letter-spacing:2px;color:var(--muted)}
+.provider-select{background:var(--panel);border:1px solid var(--border);color:var(--text);font-family:'Space Mono',monospace;font-size:11px;padding:8px 12px;border-radius:8px;outline:none;cursor:pointer;transition:all .2s}
+.provider-select:focus{border-color:var(--green)}
+.panel-btn{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;padding:8px 14px;border-radius:8px;cursor:pointer;letter-spacing:1px;transition:all .2s}
+.panel-btn:hover,.panel-btn.active{border-color:var(--yellow);color:var(--yellow);background:#f5c54211}
+.panel-badge{background:var(--yellow);color:#000;font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700;margin-left:4px}
+
+#analyze-btn{background:var(--dim);color:var(--muted);border:none;border-radius:8px;padding:15px 38px;font-size:12px;font-weight:700;letter-spacing:2px;cursor:not-allowed;transition:all .2s;font-family:'Space Mono',monospace}
+#analyze-btn.ready{background:linear-gradient(135deg,var(--green),var(--blue));color:#000;cursor:pointer}
+#analyze-btn.ready:hover{opacity:.9}
+.error{color:var(--red);font-size:13px;margin:12px auto;padding:10px 16px;background:#ff5e5e11;border:1px solid #ff5e5e33;border-radius:6px;display:none;max-width:520px;text-align:left}
+#loader{display:none;margin-top:24px}
+#loader p{color:var(--muted);font-size:12px;margin-bottom:10px}
+.loader-bar{width:200px;height:3px;background:var(--dim);border-radius:2px;margin:0 auto;overflow:hidden}
+.loader-fill{width:55%;height:100%;background:linear-gradient(90deg,var(--green),var(--blue));border-radius:2px;animation:slide 1.6s ease-in-out infinite}
+@keyframes slide{0%{transform:translateX(-200%)}100%{transform:translateX(400%)}}
+
+/* RESULTS */
+#results{display:none}
+.results-toolbar{display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.back-btn{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:8px 14px;cursor:pointer;font-size:11px;font-family:'Space Mono',monospace}
+.back-btn:hover{border-color:var(--muted);color:var(--text)}
+.export-btn{margin-left:auto;background:linear-gradient(135deg,var(--blue),var(--green));color:#000;border:none;border-radius:6px;padding:8px 18px;cursor:pointer;font-size:11px;font-weight:700;letter-spacing:1px;font-family:'Space Mono',monospace}
+.export-btn:hover{opacity:.9}
+
+/* PANEL STATUS */
+.panel-status{background:var(--panel);border:1px solid var(--yellow);border-radius:12px;padding:16px 20px;margin-bottom:20px;display:none}
+.panel-status-title{font-size:10px;letter-spacing:2px;color:var(--yellow);margin-bottom:10px}
+.panel-providers{display:flex;gap:8px;flex-wrap:wrap}
+.prov-chip{font-size:11px;padding:5px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted)}
+.prov-chip.ok{border-color:#00e5a044;background:#00e5a011;color:var(--green)}
+.prov-chip.fail{border-color:#ff5e5e44;background:#ff5e5e11;color:var(--red)}
+
+.score-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;align-items:center;gap:20px;margin-bottom:28px;flex-wrap:wrap}
+.candidate-name{font-size:20px;font-weight:700;color:var(--text);font-family:'Syne',sans-serif}
+.candidate-role{font-size:12px;color:var(--muted);margin-top:2px}
+.score-ring{width:72px;height:72px;border-radius:50%;border:3px solid var(--green);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;margin-left:auto}
+.score-num{font-size:24px;font-weight:900;font-family:'Syne',sans-serif}
+.score-label{font-size:9px;color:var(--muted)}
+.top-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:28px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card-title{font-size:10px;letter-spacing:2px;margin-bottom:14px}
+.card p{font-size:13px;color:var(--muted);line-height:1.7}
+.check-item{display:flex;gap:8px;margin-bottom:6px;font-size:13px;color:var(--muted)}
+.check-item .icon{flex-shrink:0}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px;overflow-x:auto}
+.tab-btn{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:12px 14px;cursor:pointer;font-size:11px;letter-spacing:1px;font-family:'Space Mono',monospace;white-space:nowrap;margin-bottom:-1px;transition:color .2s}
+.tab-btn.active{color:var(--text);border-bottom-color:var(--green)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+.fix-card{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:10px;padding:18px;margin-bottom:10px}
+.fix-section{font-size:10px;color:var(--blue);letter-spacing:2px;margin-bottom:5px}
+.fix-issue{font-size:13px;color:var(--red);margin-bottom:7px}
+.fix-suggestion{font-size:13px;color:var(--muted)}
+.fix-suggestion::before{content:"→ ";color:var(--green)}
+
+.skill-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.skill-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px}
+.skill-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.skill-name{font-size:14px;font-weight:700;color:var(--text);font-family:'Syne',sans-serif}
+.badge{font-size:9px;letter-spacing:1px;border-radius:4px;padding:2px 7px;border:1px solid}
+.skill-reason{font-size:12px;color:var(--muted);line-height:1.6}
+
+.learn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.learn-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px}
+.learn-platform{font-size:10px;color:var(--green);letter-spacing:1px;margin-bottom:4px}
+.learn-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;font-family:'Syne',sans-serif}
+.learn-for{font-size:11px;color:var(--muted);margin-bottom:12px}
+.learn-link{color:var(--blue);font-size:11px;text-decoration:none;border:1px solid #3b82f633;border-radius:4px;padding:4px 10px;display:inline-block}
+.learn-link:hover{background:#3b82f611}
+.free-tag{font-size:9px;color:var(--green);border:1px solid #00e5a033;background:#00e5a011;border-radius:4px;padding:1px 6px;margin-left:6px}
+
+.opp-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:20px;display:flex;gap:20px;flex-wrap:wrap;margin-bottom:10px}
+.opp-info{flex:1;min-width:200px}
+.opp-meta{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.opp-type{font-size:9px;color:var(--yellow);border:1px solid #f5c54233;background:#f5c54211;border-radius:4px;padding:2px 8px;letter-spacing:1px}
+.opp-deadline{font-size:10px;color:var(--muted)}
+.opp-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;font-family:'Syne',sans-serif}
+.opp-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.apply-btn{display:flex;align-items:center}
+.apply-link{background:linear-gradient(135deg,var(--blue),var(--green));color:#000;text-decoration:none;border-radius:7px;padding:10px 20px;font-size:11px;font-weight:700;font-family:'Space Mono',monospace;white-space:nowrap}
+.apply-link:hover{opacity:.85}
+.empty{color:var(--muted);font-size:13px;padding:20px 0;text-align:center}
+
+/* SHARED FORM STYLES */
+.form-label{font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:8px;display:block}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--input-bg);border:1px solid var(--input-border);border-radius:8px;color:var(--text);font-family:'Space Mono',monospace;font-size:12px;padding:12px;outline:none;transition:border .2s}
+.form-input:focus,.form-textarea:focus{border-color:var(--green)}
+.form-select{cursor:pointer}
+.form-textarea{resize:vertical;min-height:100px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.form-field{margin-bottom:14px}
+.action-btn{background:linear-gradient(135deg,var(--green),var(--blue));color:#000;border:none;border-radius:8px;padding:12px 28px;font-size:11px;font-weight:700;letter-spacing:2px;cursor:pointer;font-family:'Space Mono',monospace}
+.action-btn:disabled{background:var(--dim);color:var(--muted);cursor:not-allowed}
+.action-btn.secondary{background:linear-gradient(135deg,var(--blue),var(--green))}
+.mini-loader{color:var(--muted);font-size:12px;margin:14px 0;display:none}
+.output-box{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:24px;font-size:13px;line-height:1.9;color:var(--text);white-space:pre-wrap;margin-top:20px;display:none}
+.output-toolbar{display:none;gap:10px;margin-top:12px;flex-wrap:wrap}
+.copy-btn{font-size:10px;padding:7px 14px;border-radius:5px;cursor:pointer;font-family:'Space Mono',monospace;font-weight:700;background:transparent;border:1px solid var(--border);color:var(--muted);letter-spacing:1px}
+.copy-btn:hover{border-color:var(--muted);color:var(--text)}
+.pdf-btn{font-size:10px;padding:7px 14px;border-radius:5px;cursor:pointer;font-family:'Space Mono',monospace;font-weight:700;background:var(--blue);color:#fff;border:none;letter-spacing:1px}
+.pdf-btn:hover{opacity:.9}
+
+/* JD MATCHER */
+.match-score-bar{background:var(--dim);border-radius:8px;height:12px;margin:8px 0 4px;overflow:hidden}
+.match-score-fill{height:100%;border-radius:8px;transition:width 1s ease}
+.match-keyword{display:inline-block;font-size:10px;border-radius:4px;padding:2px 8px;margin:2px;border:1px solid}
+.kw-found{color:var(--green);border-color:#00e5a033;background:#00e5a011}
+.kw-missing{color:var(--red);border-color:#ff5e5e33;background:#ff5e5e11}
+
+/* RESUME GENERATOR */
+.tone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+.tone-card{background:var(--panel);border:2px solid var(--border);border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s}
+.tone-card:hover{border-color:var(--muted)}
+.tone-card.selected{border-color:var(--green);background:#00e5a011}
+.tone-card .tone-icon{font-size:24px;margin-bottom:6px}
+.tone-card .tone-name{font-size:11px;font-weight:700;color:var(--text);letter-spacing:1px}
+.tone-card .tone-desc{font-size:10px;color:var(--muted);margin-top:3px}
+.rg-section{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;margin-top:16px}
+.rg-section-title{font-size:10px;letter-spacing:2px;color:var(--green);margin-bottom:14px}
+.rg-output{font-size:13px;line-height:1.9;color:var(--text);white-space:pre-wrap;display:none}
+.ats-badge{display:inline-block;font-size:9px;padding:2px 8px;border-radius:4px;background:#00e5a011;border:1px solid #00e5a033;color:var(--green);letter-spacing:1px;margin-left:8px}
+
+@media(max-width:640px){
+  header{padding:14px 20px}
+  .form-grid{grid-template-columns:1fr}
+  .powered{display:none}
+  .tone-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-icon">📄</div>
+  <div>
+    <div class="logo-title">RESUME.AI</div>
+    <div class="logo-sub">CAREER INTELLIGENCE ENGINE</div>
+  </div>
+  <div class="header-right">
+    <div class="powered">6 AI MODELS</div>
+    <label class="switch" title="Toggle theme">
+      <input type="checkbox" id="toggle-input" onchange="toggleTheme(this)">
+      <span class="slider round">
+        <span class="sun-moon">
+          <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"/></svg>
+          <svg id="moon-dot-2" class="moon-dot" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"/></svg>
+          <svg id="moon-dot-3" class="moon-dot" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"/></svg>
+          <svg id="light-ray-1" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"/></svg>
+          <svg id="light-ray-2" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"/></svg>
+          <svg id="light-ray-3" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"/></svg>
+        </span>
+        <svg id="cloud-1" class="cloud-light" viewBox="0 0 100 60"><ellipse cx="50" cy="40" rx="40" ry="20"/><ellipse cx="35" cy="35" rx="25" ry="18"/><ellipse cx="65" cy="35" rx="20" ry="15"/></svg>
+        <svg id="cloud-2" class="cloud-light" viewBox="0 0 100 60"><ellipse cx="50" cy="40" rx="40" ry="20"/><ellipse cx="35" cy="35" rx="25" ry="18"/></svg>
+        <svg id="cloud-3" class="cloud-dark" viewBox="0 0 100 60"><ellipse cx="50" cy="40" rx="40" ry="20"/><ellipse cx="65" cy="35" rx="20" ry="15"/></svg>
+        <svg id="cloud-4" class="cloud-dark" viewBox="0 0 100 60"><ellipse cx="50" cy="40" rx="40" ry="20"/><ellipse cx="35" cy="35" rx="25" ry="18"/><ellipse cx="65" cy="35" rx="20" ry="15"/></svg>
+        <svg id="cloud-5" class="cloud-dark" viewBox="0 0 100 60"><ellipse cx="50" cy="40" rx="40" ry="20"/><ellipse cx="35" cy="35" rx="25" ry="18"/></svg>
+        <svg id="cloud-6" class="cloud-light" viewBox="0 0 100 60"><ellipse cx="50" cy="40" rx="40" ry="20"/><ellipse cx="65" cy="35" rx="20" ry="15"/></svg>
+        <span class="stars">
+          <svg id="star-1" class="star" viewBox="0 0 100 100"><polygon points="50,0 61,35 98,35 68,57 79,91 50,70 21,91 32,57 2,35 39,35"/></svg>
+          <svg id="star-2" class="star" viewBox="0 0 100 100"><polygon points="50,0 61,35 98,35 68,57 79,91 50,70 21,91 32,57 2,35 39,35"/></svg>
+          <svg id="star-3" class="star" viewBox="0 0 100 100"><polygon points="50,0 61,35 98,35 68,57 79,91 50,70 21,91 32,57 2,35 39,35"/></svg>
+          <svg id="star-4" class="star" viewBox="0 0 100 100"><polygon points="50,0 61,35 98,35 68,57 79,91 50,70 21,91 32,57 2,35 39,35"/></svg>
+        </span>
+      </span>
+    </label>
+  </div>
+</header>
+
+<main>
+  <!-- UPLOAD -->
+  <div id="upload-section">
+    <h1>Unlock Your Career's<br><span>Full Potential</span></h1>
+    <p class="subtitle">Upload your resume. Get AI-powered analysis, skill gaps, cover letters, resume rewrites &amp; more.</p>
+    <div id="dropzone" onclick="document.getElementById('file-input').click()">
+      <div class="dz-icon" id="dz-icon">📂</div>
+      <div class="dz-text" id="dz-text">Drop your resume here or click to browse</div>
+      <div class="dz-hint">Supports PDF and TXT files</div>
+    </div>
+    <input type="file" id="file-input" accept=".pdf,.txt"/>
+    <div class="provider-bar">
+      <span class="provider-label">AI MODEL:</span>
+      <select class="provider-select" id="provider-select">
+        <option value="claude">🤖 Claude (Anthropic)</option>
+        <option value="mistral">🌊 Mistral Small</option>
+        <option value="groq">⚡ Llama 3.3 70B (Groq)</option>
+        <option value="cohere">🧠 Command R+ (Cohere)</option>
+        <option value="openrouter">🔀 Llama 3.3 (OpenRouter)</option>
+        <option value="together">🤝 Llama 3.3 (Together AI)</option>
+      </select>
+      <button class="panel-btn" id="panel-btn" onclick="togglePanel()">
+        ⚖️ Judge Panel <span class="panel-badge" id="panel-badge" style="display:none">ON</span>
+      </button>
+    </div>
+    <div id="error" class="error"></div>
+    <button id="analyze-btn" onclick="analyzeResume()">ANALYZE RESUME →</button>
+    <div id="loader">
+      <p>⚙️ Running career intelligence analysis...</p>
+      <div class="loader-bar"><div class="loader-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <div class="results-toolbar">
+      <button class="back-btn" onclick="resetApp()">← NEW RESUME</button>
+      <button class="export-btn" onclick="exportPDFReport()">⬇ EXPORT PDF REPORT</button>
+    </div>
+    <div class="panel-status" id="panel-status">
+      <div class="panel-status-title">⚖️ JUDGE PANEL RESULTS</div>
+      <div class="panel-providers" id="panel-providers"></div>
+    </div>
+    <div class="score-card">
+      <div>
+        <div class="logo-sub" style="margin-bottom:4px">CANDIDATE</div>
+        <div class="candidate-name" id="res-name">—</div>
+        <div class="candidate-role" id="res-role">—</div>
+      </div>
+      <div class="score-ring" id="score-ring">
+        <div class="score-num" id="score-num">—</div>
+        <div class="score-label">SCORE</div>
+      </div>
+    </div>
+    <div class="top-grid">
+      <div class="card" style="border-top:2px solid var(--blue)">
+        <div class="card-title" style="color:var(--blue)">📊 SCORE ANALYSIS</div>
+        <p id="res-score-reason">—</p>
+      </div>
+      <div class="card" style="border-top:2px solid var(--green)">
+        <div class="card-title" style="color:var(--green)">💪 STRENGTHS</div>
+        <div id="res-strengths"></div>
+      </div>
+      <div class="card" style="border-top:2px solid var(--yellow)">
+        <div class="card-title" style="color:var(--yellow)">⚡ QUICK WINS</div>
+        <div id="res-quickwins"></div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('improvements',this)">📝 Fixes</button>
+      <button class="tab-btn" onclick="switchTab('skills',this)">🧠 Skill Gaps</button>
+      <button class="tab-btn" onclick="switchTab('learning',this)">📚 Learn</button>
+      <button class="tab-btn" onclick="switchTab('opportunities',this)">🚀 Opportunities</button>
+      <button class="tab-btn" onclick="switchTab('matcher',this)">🎯 JD Matcher</button>
+      <button class="tab-btn" onclick="switchTab('coverletter',this)">✉️ Cover Letter</button>
+      <button class="tab-btn" onclick="switchTab('resumegen',this)">✨ Resume Generator</button>
+    </div>
+
+    <div id="tab-improvements" class="tab-panel active"></div>
+    <div id="tab-skills" class="tab-panel"></div>
+    <div id="tab-learning" class="tab-panel"></div>
+    <div id="tab-opportunities" class="tab-panel"></div>
+
+    <!-- JD MATCHER -->
+    <div id="tab-matcher" class="tab-panel">
+      <label class="form-label">PASTE JOB DESCRIPTION</label>
+      <textarea class="form-textarea" id="jd-input" style="min-height:160px" placeholder="Paste the full job description here..."></textarea>
+      <button class="action-btn" id="jd-btn" onclick="matchJD()" style="margin-top:12px">MATCH RESUME →</button>
+      <div class="mini-loader" id="jd-loader">⚙️ Analyzing match...</div>
+      <div id="match-result" style="margin-top:20px;display:none"></div>
+    </div>
+
+    <!-- COVER LETTER -->
+    <div id="tab-coverletter" class="tab-panel">
+      <div class="form-grid">
+        <div class="form-field">
+          <label class="form-label">COMPANY NAME</label>
+          <input type="text" class="form-input" id="cl-company" placeholder="e.g. Google">
+        </div>
+        <div class="form-field">
+          <label class="form-label">JOB TITLE</label>
+          <input type="text" class="form-input" id="cl-jobtitle" placeholder="e.g. Software Engineer">
+        </div>
+        <div class="form-field">
+          <label class="form-label">HIRING MANAGER (optional)</label>
+          <input type="text" class="form-input" id="cl-manager" placeholder="e.g. Sarah Johnson">
+        </div>
+        <div class="form-field">
+          <label class="form-label">TONE</label>
+          <select class="form-select" id="cl-tone">
+            <option value="professional">Professional</option>
+            <option value="enthusiastic">Enthusiastic</option>
+            <option value="concise">Concise</option>
+            <option value="creative">Creative</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">KEY POINTS TO HIGHLIGHT (optional)</label>
+        <textarea class="form-textarea" id="cl-highlights" placeholder="Specific achievements or skills to emphasize..."></textarea>
+      </div>
+      <button class="action-btn" id="cl-btn" onclick="generateCoverLetter()">GENERATE COVER LETTER →</button>
+      <div class="mini-loader" id="cl-loader">⚙️ Writing your cover letter...</div>
+      <div class="output-box" id="cl-output"></div>
+      <div class="output-toolbar" id="cl-toolbar">
+        <button class="copy-btn" onclick="copyOutput('cl-output','cl-copy-btn')" id="cl-copy-btn">📋 COPY TEXT</button>
+        <button class="pdf-btn" onclick="exportTextPDF('cl-output','Cover_Letter')">⬇ SAVE AS PDF</button>
+      </div>
+    </div>
+
+    <!-- RESUME GENERATOR -->
+    <div id="tab-resumegen" class="tab-panel">
+      <div class="form-grid">
+        <div class="form-field">
+          <label class="form-label">TARGET JOB TITLE</label>
+          <input type="text" class="form-input" id="rg-jobtitle" placeholder="e.g. Senior Product Manager">
+        </div>
+        <div class="form-field">
+          <label class="form-label">TARGET COMPANY (optional)</label>
+          <input type="text" class="form-input" id="rg-company" placeholder="e.g. Stripe">
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">ADDITIONAL SKILLS / CONTEXT (optional)</label>
+        <textarea class="form-textarea" id="rg-context" placeholder="Any extra experience, projects, or skills not in the original resume..."></textarea>
+      </div>
+
+      <label class="form-label" style="margin-bottom:12px">SELECT TONE</label>
+      <div class="tone-grid">
+        <div class="tone-card selected" onclick="selectTone(this,'professional')">
+          <div class="tone-icon">💼</div>
+          <div class="tone-name">PROFESSIONAL</div>
+          <div class="tone-desc">Clean &amp; formal</div>
+        </div>
+        <div class="tone-card" onclick="selectTone(this,'enthusiastic')">
+          <div class="tone-icon">🔥</div>
+          <div class="tone-name">ENTHUSIASTIC</div>
+          <div class="tone-desc">High energy</div>
+        </div>
+        <div class="tone-card" onclick="selectTone(this,'creative')">
+          <div class="tone-icon">🎨</div>
+          <div class="tone-name">CREATIVE</div>
+          <div class="tone-desc">Bold &amp; unique</div>
+        </div>
+        <div class="tone-card" onclick="selectTone(this,'concise')">
+          <div class="tone-icon">⚡</div>
+          <div class="tone-name">CONCISE</div>
+          <div class="tone-desc">Tight &amp; punchy</div>
+        </div>
+        <div class="tone-card" onclick="selectTone(this,'ats')">
+          <div class="tone-icon">🤖</div>
+          <div class="tone-name">ATS-OPTIMIZED</div>
+          <div class="tone-desc">Keyword-rich</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="action-btn" id="rg-btn" onclick="generateResume()">✨ GENERATE RESUME →</button>
+      </div>
+      <div class="mini-loader" id="rg-loader">⚙️ Rewriting your resume...</div>
+
+      <div id="rg-result" style="display:none;margin-top:24px">
+        <div class="rg-section">
+          <div class="rg-section-title" id="rg-result-title">GENERATED RESUME</div>
+          <div class="rg-output" id="rg-output"></div>
+        </div>
+        <div class="output-toolbar" id="rg-toolbar" style="margin-top:12px">
+          <button class="copy-btn" onclick="copyOutput('rg-output','rg-copy-btn')" id="rg-copy-btn">📋 COPY TEXT</button>
+          <button class="pdf-btn" onclick="exportTextPDF('rg-output','Resume')">⬇ SAVE AS PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+'use strict';
+let selectedFile = null;
+let lastAnalysis = null;
+let panelMode = false;
+let selectedTone = 'professional';
+
+// THEME
+function toggleTheme(cb) {
+  const t = cb.checked ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('resume-ai-theme', t);
+}
+(function(){
+  const t = localStorage.getItem('resume-ai-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  if (t === 'light') document.getElementById('toggle-input').checked = true;
+})();
+
+// PANEL TOGGLE
+function togglePanel() {
+  panelMode = !panelMode;
+  document.getElementById('panel-btn').classList.toggle('active', panelMode);
+  document.getElementById('panel-badge').style.display = panelMode ? 'inline' : 'none';
+  const sel = document.getElementById('provider-select');
+  sel.disabled = panelMode;
+  sel.style.opacity = panelMode ? '0.4' : '1';
+}
+
+// TONE SELECT
+function selectTone(el, tone) {
+  document.querySelectorAll('.tone-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedTone = tone;
+}
+
+// DROPZONE
+const dz = document.getElementById('dropzone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag'); handleFile(e.dataTransfer.files[0]); });
+document.getElementById('file-input').addEventListener('change', e => handleFile(e.target.files[0]));
+
+function handleFile(f) {
+  if (!f) return;
+  if (!f.name.endsWith('.pdf') && !f.name.endsWith('.txt')) { showError('Please upload a PDF or TXT file.'); return; }
+  selectedFile = f;
+  hideError();
+  document.getElementById('dz-icon').textContent = '✅';
+  document.getElementById('dz-text').textContent = f.name;
+  dz.classList.add('has-file');
+  document.getElementById('analyze-btn').classList.add('ready');
+}
+function showError(msg) { const el = document.getElementById('error'); el.textContent = msg; el.style.display = 'block'; }
+function hideError() { document.getElementById('error').style.display = 'none'; }
+
+// SYSTEM PROMPT
+const SYSTEM_PROMPT = `You are an expert career counselor and resume analyst. Analyze the resume and respond ONLY with a valid JSON object — no markdown, no backticks, no explanation:
+{
+  "name": "candidate name or Unknown",
+  "currentRole": "current or target role",
+  "overallScore": 75,
+  "scoreReason": "brief reason in 1-2 sentences",
+  "resumeImprovements": [{"section":"section name","issue":"what is wrong","suggestion":"specific fix"}],
+  "skillGaps": [{"skill":"skill name","importance":"High/Medium/Low","reason":"why it matters"}],
+  "learningResources": [{"skill":"skill","platform":"platform","resourceName":"course name","url":"URL or null","free":true}],
+  "opportunities": [{"type":"Internship/Research/Open Source/Hackathon","name":"name","description":"desc","url":"URL or null","deadline":"date or Rolling"}],
+  "strengths": ["strength 1","strength 2","strength 3"],
+  "quickWins": ["quick win 1","quick win 2","quick win 3"]
+}`;
+
+// API CALL
+async function callAPI(payload) {
+  const res = await fetch('/api/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  if (!res.ok || data.error) {
+    const e = data.error;
+    throw new Error(typeof e === 'string' ? e : (e?.message || JSON.stringify(e) || `Server error ${res.status}`));
+  }
+  return data;
+}
+
+// ANALYZE
+async function analyzeResume() {
+  if (!selectedFile) return;
+  const btn = document.getElementById('analyze-btn');
+  if (!btn.classList.contains('ready')) return;
+  const provider = document.getElementById('provider-select').value;
+  btn.textContent = panelMode ? '⚖️ JUDGING...' : 'ANALYZING...';
+  btn.classList.remove('ready');
+  document.getElementById('loader').style.display = 'block';
+  hideError();
+  try {
+    let messages;
+    if (selectedFile.name.endsWith('.pdf')) {
+      const buf = await selectedFile.arrayBuffer();
+      const b64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
+      messages = [{ role: 'user', content: [
+        { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } },
+        { type: 'text', text: 'Analyze this resume and return the JSON.' }
+      ]}];
+    } else {
+      const text = await selectedFile.text();
+      messages = [{ role: 'user', content: `Resume:\n\n${text}\n\nAnalyze and return the JSON.` }];
+    }
+    const data = await callAPI({ provider, panel: panelMode, max_tokens: 4000, system: SYSTEM_PROMPT, messages });
+    let analysis;
+    if (panelMode) {
+      analysis = data.result;
+      renderPanelStatus(data.panel || []);
+    } else {
+      analysis = JSON.parse((data.result || '').replace(/```json|```/g, '').trim());
+    }
+    lastAnalysis = analysis;
+    renderResults(analysis);
+  } catch (err) {
+    showError('Analysis failed: ' + err.message);
+    btn.textContent = 'ANALYZE RESUME →';
+    btn.classList.add('ready');
+  } finally {
+    document.getElementById('loader').style.display = 'none';
+  }
+}
+
+// PANEL STATUS
+function renderPanelStatus(panelResults) {
+  document.getElementById('panel-status').style.display = 'block';
+  document.getElementById('panel-providers').innerHTML = panelResults.map(p =>
+    `<div class="prov-chip ${p.success ? 'ok' : 'fail'}">${p.success ? '✅' : '❌'} ${p.provider}${!p.success ? ` <span style="font-size:9px;opacity:.7">(${(p.error||'').slice(0,40)})</span>` : ''}</div>`
+  ).join('');
+}
+
+// RENDER RESULTS
+function renderResults(a) {
+  document.getElementById('upload-section').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('res-name').textContent = a.name || 'Unknown';
+  document.getElementById('res-role').textContent = a.currentRole || '';
+  document.getElementById('res-score-reason').textContent = a.scoreReason || '';
+  const score = a.overallScore || 0;
+  const sn = document.getElementById('score-num');
+  sn.textContent = score;
+  const color = score >= 80 ? 'var(--green)' : score >= 60 ? 'var(--yellow)' : 'var(--red)';
+  sn.style.color = color;
+  document.getElementById('score-ring').style.borderColor = color;
+  document.getElementById('res-strengths').innerHTML = (a.strengths||[]).map(s => `<div class="check-item"><span class="icon" style="color:var(--green)">✓</span>${s}</div>`).join('');
+  document.getElementById('res-quickwins').innerHTML = (a.quickWins||[]).map((w,i) => `<div class="check-item"><span class="icon" style="color:var(--yellow)">${i+1}.</span>${w}</div>`).join('');
+  document.getElementById('tab-improvements').innerHTML = (a.resumeImprovements||[]).length
+    ? a.resumeImprovements.map(x => `<div class="fix-card"><div class="fix-section">${x.section||''}</div><div class="fix-issue">⚠ ${x.issue||''}</div><div class="fix-suggestion">${x.suggestion||''}</div></div>`).join('')
+    : '<div class="empty">No improvements needed — great resume!</div>';
+  const ic = { High:'var(--red)', Medium:'var(--yellow)', Low:'var(--green)' };
+  document.getElementById('tab-skills').innerHTML = `<div class="skill-grid">${(a.skillGaps||[]).map(x => { const c=ic[x.importance]||'#aaa'; return `<div class="skill-card"><div class="skill-top"><div class="skill-name">${x.skill}</div><span class="badge" style="color:${c};border-color:${c}44;background:${c}11">${x.importance}</span></div><div class="skill-reason">${x.reason}</div></div>`; }).join('')}</div>`;
+  document.getElementById('tab-learning').innerHTML = `<div class="learn-grid">${(a.learningResources||[]).map(x => `<div class="learn-card"><div class="learn-platform">${x.platform}${x.free?'<span class="free-tag">FREE</span>':''}</div><div class="learn-name">${x.resourceName}</div><div class="learn-for">For: ${x.skill}</div>${x.url?`<a class="learn-link" href="${x.url}" target="_blank" rel="noopener">Open Resource →</a>`:`<span style="font-size:11px;color:var(--muted)">Search on ${x.platform}</span>`}</div>`).join('')}</div>`;
+  document.getElementById('tab-opportunities').innerHTML = (a.opportunities||[]).map(x => `<div class="opp-card"><div class="opp-info"><div class="opp-meta"><span class="opp-type">${(x.type||'').toUpperCase()}</span><span class="opp-deadline">Deadline: ${x.deadline||'Rolling'}</span></div><div class="opp-name">${x.name}</div><div class="opp-desc">${x.description}</div></div>${x.url?`<div class="apply-btn"><a class="apply-link" href="${x.url}" target="_blank" rel="noopener">APPLY →</a></div>`:''}</div>`).join('');
+}
+
+// JD MATCHER
+async function matchJD() {
+  const jd = document.getElementById('jd-input').value.trim();
+  if (!jd || !lastAnalysis) { alert('Please paste a job description first.'); return; }
+  const btn = document.getElementById('jd-btn');
+  btn.disabled = true; btn.textContent = 'MATCHING...';
+  document.getElementById('jd-loader').style.display = 'block';
+  document.getElementById('match-result').style.display = 'none';
+  const system = `You are a career expert. Compare resume and job description. Respond ONLY with valid JSON, no markdown:
+{"matchScore":72,"summary":"1-2 sentence summary","foundKeywords":["kw1"],"missingKeywords":["kw2"],"suggestions":["tip1","tip2","tip3"]}`;
+  const ctx = `Candidate: ${lastAnalysis.name}, Role: ${lastAnalysis.currentRole}. Strengths: ${(lastAnalysis.strengths||[]).join(', ')}. Skills: ${(lastAnalysis.skillGaps||[]).map(s=>s.skill).join(', ')}.`;
+  const provider = document.getElementById('provider-select').value;
+  try {
+    const data = await callAPI({ provider, panel: false, max_tokens: 1500, system, messages: [{ role: 'user', content: `Resume:\n${ctx}\n\nJob Description:\n${jd}` }] });
+    const m = JSON.parse((data.result||'').replace(/```json|```/g,'').trim());
+    const score = m.matchScore || 0;
+    const color = score >= 75 ? 'var(--green)' : score >= 50 ? 'var(--yellow)' : 'var(--red)';
+    document.getElementById('match-result').style.display = 'block';
+    document.getElementById('match-result').innerHTML = `
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title" style="color:${color}">🎯 MATCH SCORE: ${score}%</div>
+        <div class="match-score-bar"><div class="match-score-fill" style="width:${score}%;background:${color}"></div></div>
+        <p style="margin-top:10px">${m.summary||''}</p>
+      </div>
+      <div class="top-grid">
+        <div class="card" style="border-top:2px solid var(--green)">
+          <div class="card-title" style="color:var(--green)">✅ KEYWORDS FOUND</div>
+          <div style="margin-top:6px">${(m.foundKeywords||[]).map(k=>`<span class="match-keyword kw-found">${k}</span>`).join('')||'<span style="font-size:12px;color:var(--muted)">None detected</span>'}</div>
+        </div>
+        <div class="card" style="border-top:2px solid var(--red)">
+          <div class="card-title" style="color:var(--red)">❌ KEYWORDS MISSING</div>
+          <div style="margin-top:6px">${(m.missingKeywords||[]).map(k=>`<span class="match-keyword kw-missing">${k}</span>`).join('')||'<span style="font-size:12px;color:var(--muted)">None — great match!</span>'}</div>
+        </div>
+      </div>
+      ${(m.suggestions||[]).length?`<div class="card" style="margin-top:14px;border-top:2px solid var(--blue)"><div class="card-title" style="color:var(--blue)">💡 HOW TO IMPROVE YOUR MATCH</div>${m.suggestions.map(s=>`<div class="fix-suggestion" style="margin-bottom:8px">${s}</div>`).join('')}</div>`:''}`;
+  } catch(e) {
+    document.getElementById('match-result').style.display = 'block';
+    document.getElementById('match-result').innerHTML = `<div class="empty" style="color:var(--red)">Match failed: ${e.message}</div>`;
+  } finally {
+    btn.disabled = false; btn.textContent = 'MATCH RESUME →';
+    document.getElementById('jd-loader').style.display = 'none';
+  }
+}
+
+// COVER LETTER
+async function generateCoverLetter() {
+  const company = document.getElementById('cl-company').value.trim();
+  const jobtitle = document.getElementById('cl-jobtitle').value.trim();
+  if (!company || !jobtitle) { alert('Please enter Company Name and Job Title.'); return; }
+  if (!lastAnalysis) { alert('Please analyze your resume first.'); return; }
+  const btn = document.getElementById('cl-btn');
+  btn.disabled = true; btn.textContent = 'GENERATING...';
+  document.getElementById('cl-loader').style.display = 'block';
+  document.getElementById('cl-output').style.display = 'none';
+  document.getElementById('cl-toolbar').style.display = 'none';
+  const tone = document.getElementById('cl-tone').value;
+  const manager = document.getElementById('cl-manager').value.trim() || 'Hiring Manager';
+  const highlights = document.getElementById('cl-highlights').value.trim();
+  const provider = document.getElementById('provider-select').value;
+  const system = `You are an expert cover letter writer. Write a compelling ${tone} cover letter. Return ONLY the letter text — no JSON, no markdown. 3-4 paragraphs, ready to send.`;
+  const ctx = `Name: ${lastAnalysis.name||'the candidate'}. Role: ${jobtitle} at ${company}. To: ${manager}. Background: ${lastAnalysis.currentRole}. Strengths: ${(lastAnalysis.strengths||[]).join(', ')}.${highlights?` Highlights: ${highlights}`:''}`;
+  try {
+    const data = await callAPI({ provider, panel: false, max_tokens: 1200, system, messages: [{ role: 'user', content: ctx }] });
+    document.getElementById('cl-output').textContent = (data.result||'').trim();
+    document.getElementById('cl-output').style.display = 'block';
+    document.getElementById('cl-toolbar').style.display = 'flex';
+  } catch(e) {
+    document.getElementById('cl-output').textContent = 'Error: ' + e.message;
+    document.getElementById('cl-output').style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'GENERATE COVER LETTER →';
+    document.getElementById('cl-loader').style.display = 'none';
+  }
+}
+
+// RESUME GENERATOR
+async function generateResume() {
+  if (!lastAnalysis) { alert('Please analyze your resume first.'); return; }
+  const jobtitle = document.getElementById('rg-jobtitle').value.trim();
+  if (!jobtitle) { alert('Please enter a target job title.'); return; }
+  const company = document.getElementById('rg-company').value.trim();
+  const context = document.getElementById('rg-context').value.trim();
+  const provider = document.getElementById('provider-select').value;
+  const btn = document.getElementById('rg-btn');
+  btn.disabled = true; btn.textContent = '✨ GENERATING...';
+  document.getElementById('rg-loader').style.display = 'block';
+  document.getElementById('rg-result').style.display = 'none';
+
+  const toneInstructions = {
+    professional: 'Use formal, clean language. Focus on measurable achievements and clear career progression.',
+    enthusiastic: 'Use energetic, passionate language. Show excitement about the role and genuine drive.',
+    creative: 'Use bold, distinctive language. Stand out with creative phrasing while staying professional.',
+    concise: 'Be extremely tight and punchy. Every word must earn its place. No filler.',
+    ats: 'Optimize heavily for ATS systems. Use exact keywords from the job title and industry. Include relevant technical terms, certifications, and skills. Use standard section headers.',
+  };
+
+  const isATS = selectedTone === 'ats';
+  const system = `You are an expert resume writer. Rewrite the provided resume for a specific target role. Return ONLY the complete rewritten resume as plain text — no JSON, no markdown headers, no explanation. ${toneInstructions[selectedTone]}${isATS ? ' Format: Name, Contact, Summary, Skills, Experience, Education.' : ''}`;
+  const prompt = `Rewrite this resume for a ${jobtitle}${company ? ` at ${company}` : ''} role.
+Candidate: ${lastAnalysis.name}, Current Role: ${lastAnalysis.currentRole}.
+Strengths: ${(lastAnalysis.strengths||[]).join(', ')}.
+Skill gaps to address: ${(lastAnalysis.skillGaps||[]).slice(0,5).map(s=>s.skill).join(', ')}.
+Quick wins to highlight: ${(lastAnalysis.quickWins||[]).join(', ')}.${context ? `\nAdditional context: ${context}` : ''}
+Tone: ${selectedTone}. Make it compelling, specific, and tailored to this exact role.`;
+
+  try {
+    const data = await callAPI({ provider, panel: false, max_tokens: 3000, system, messages: [{ role: 'user', content: prompt }] });
+    const resume = (data.result||'').trim();
+    document.getElementById('rg-output').textContent = resume;
+    document.getElementById('rg-output').style.display = 'block';
+    document.getElementById('rg-result-title').innerHTML = `GENERATED RESUME — ${selectedTone.toUpperCase()}${isATS ? '<span class="ats-badge">ATS OPTIMIZED</span>' : ''}`;
+    document.getElementById('rg-result').style.display = 'block';
+    document.getElementById('rg-toolbar').style.display = 'flex';
+  } catch(e) {
+    document.getElementById('rg-output').textContent = 'Error: ' + e.message;
+    document.getElementById('rg-output').style.display = 'block';
+    document.getElementById('rg-result').style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = '✨ GENERATE RESUME →';
+    document.getElementById('rg-loader').style.display = 'none';
+  }
+}
+
+// COPY HELPER
+function copyOutput(outputId, btnId) {
+  navigator.clipboard.writeText(document.getElementById(outputId).textContent).then(() => {
+    const b = document.getElementById(btnId);
+    b.textContent = '✅ COPIED!';
+    setTimeout(() => b.textContent = '📋 COPY TEXT', 2000);
+  });
+}
+
+// PDF EXPORT (text output)
+function exportTextPDF(outputId, filename) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const text = document.getElementById(outputId).textContent;
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(11);
+  const lines = doc.splitTextToSize(text, 170);
+  let y = 20;
+  lines.forEach(l => {
+    if (y > 272) { doc.addPage(); y = 20; }
+    doc.text(l, 20, y);
+    y += 7;
+  });
+  doc.save(filename.replace(/\s+/g,'_') + '_' + Date.now() + '.pdf');
+}
+
+// EXPORT PDF REPORT
+function exportPDFReport() {
+  if (!lastAnalysis) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const a = lastAnalysis;
+  let y = 20;
+  const addText = (text, size, bold) => {
+    doc.setFontSize(size||11); doc.setFont('helvetica', bold?'bold':'normal');
+    doc.splitTextToSize(String(text||''), 170).forEach(l => { if(y>272){doc.addPage();y=20;} doc.text(l,20,y); y+=7; });
+    y+=2;
+  };
+  const addSection = t => { y+=4; addText(t,13,true); doc.setDrawColor(0,229,160); doc.line(20,y,190,y); y+=6; };
+  addText('RESUME.AI — Career Analysis Report', 18, true);
+  addText('Generated: ' + new Date().toLocaleDateString(), 9); y+=4;
+  addText(a.name||'Unknown', 14, true);
+  addText(a.currentRole||'', 11);
+  addText('Overall Score: ' + (a.overallScore||0) + '/100', 12, true);
+  addText(a.scoreReason||'');
+  addSection('STRENGTHS'); (a.strengths||[]).forEach(s=>addText('• '+s));
+  addSection('QUICK WINS'); (a.quickWins||[]).forEach(w=>addText('• '+w));
+  addSection('RESUME IMPROVEMENTS'); (a.resumeImprovements||[]).forEach(x=>{addText('['+x.section+'] '+x.issue,11,true);addText('→ '+x.suggestion);y+=2;});
+  addSection('SKILL GAPS'); (a.skillGaps||[]).forEach(x=>{addText(x.skill+' — '+x.importance,11,true);addText(x.reason);y+=2;});
+  doc.save('ResumeAI_'+(a.name||'Report').replace(/\s+/g,'_')+'.pdf');
+}
+
+// TABS
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// RESET
+function resetApp() {
+  document.getElementById('upload-section').style.display = 'block';
+  document.getElementById('results').style.display = 'none';
+  selectedFile = null; lastAnalysis = null;
+  document.getElementById('dz-icon').textContent = '📂';
+  document.getElementById('dz-text').textContent = 'Drop your resume here or click to browse';
+  dz.classList.remove('has-file','drag');
+  const btn = document.getElementById('analyze-btn');
+  btn.textContent = 'ANALYZE RESUME →'; btn.classList.remove('ready');
+  document.getElementById('file-input').value = '';
+  document.getElementById('jd-input').value = '';
+  document.getElementById('match-result').style.display = 'none';
+  document.getElementById('cl-output').style.display = 'none';
+  document.getElementById('cl-toolbar').style.display = 'none';
+  document.getElementById('rg-result').style.display = 'none';
+  document.getElementById('panel-status').style.display = 'none';
+  switchTab('improvements', document.querySelector('.tab-btn'));
+}
+</script>
+</body>
+</html>
