@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SKILLECT.AI — Career Intelligence Engine</title>
+<title>Resume.AI — Career Intelligence Engine</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -203,11 +203,46 @@ h1 span{color:var(--green)}
 .rg-output{font-size:13px;line-height:1.9;color:var(--text);white-space:pre-wrap;display:none}
 .ats-badge{display:inline-block;font-size:9px;padding:2px 8px;border-radius:4px;background:#00e5a011;border:1px solid #00e5a033;color:var(--green);letter-spacing:1px;margin-left:8px}
 
+/* MODE PICKER */
+.mode-picker{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:620px;margin:0 auto 28px}
+.mode-card{border:2px solid var(--border);border-radius:14px;padding:28px 22px;cursor:pointer;background:transparent;transition:all .22s;text-align:left;position:relative;overflow:hidden}
+.mode-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .22s}
+.mode-card:hover{border-color:var(--green);transform:translateY(-2px)}
+.mode-card:hover::before{opacity:1}
+.mode-card.active{border-color:var(--green);background:rgba(0,229,160,0.05)}
+.mode-card.active-blue{border-color:var(--blue);background:rgba(59,130,246,0.05)}
+.mode-card.active-blue:hover{border-color:var(--blue)}
+.mode-icon{font-size:32px;margin-bottom:10px;display:block}
+.mode-title{font-size:13px;font-weight:700;color:var(--text);letter-spacing:1px;font-family:'Syne',sans-serif;margin-bottom:4px}
+.mode-desc{font-size:11px;color:var(--muted);line-height:1.5}
+.mode-badge{position:absolute;top:12px;right:12px;font-size:8px;padding:2px 7px;border-radius:3px;background:var(--green);color:#000;font-weight:700;letter-spacing:1px}
+.mode-badge.blue{background:var(--blue);color:#fff}
+
+/* SCRATCH FORM */
+#scratch-section{display:none;max-width:620px;margin:0 auto}
+.scratch-header{text-align:center;margin-bottom:24px}
+.scratch-header h2{font-size:20px;font-weight:700;font-family:'Syne',sans-serif;color:var(--text);margin-bottom:6px}
+.scratch-header p{font-size:12px;color:var(--muted)}
+.scratch-step{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:12px}
+.scratch-step-label{font-size:9px;letter-spacing:2px;color:var(--green);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.scratch-step-num{width:20px;height:20px;border-radius:50%;background:var(--green);color:#000;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.scratch-back{background:transparent;border:none;color:var(--muted);font-size:11px;font-family:'Space Mono',monospace;cursor:pointer;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:6px}
+.scratch-back:hover{color:var(--text)}
+.exp-entry{background:var(--dim);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px;position:relative}
+.exp-remove{position:absolute;top:10px;right:10px;background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1}
+.exp-remove:hover{color:var(--red)}
+.add-entry-btn{background:transparent;border:1px dashed var(--border);color:var(--muted);border-radius:7px;padding:9px 16px;font-size:11px;font-family:'Space Mono',monospace;cursor:pointer;width:100%;margin-top:4px;transition:all .2s}
+.add-entry-btn:hover{border-color:var(--green);color:var(--green)}
+#scratch-analyze-btn{background:var(--dim);color:var(--muted);border:none;border-radius:8px;padding:15px 38px;font-size:12px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .2s;font-family:'Space Mono',monospace;width:100%;margin-top:8px}
+#scratch-analyze-btn.ready{background:linear-gradient(135deg,var(--green),var(--blue));color:#000}
+#scratch-analyze-btn.ready:hover{opacity:.9}
+
 @media(max-width:640px){
   header{padding:14px 20px}
   .form-grid{grid-template-columns:1fr}
   .powered{display:none}
   .tone-grid{grid-template-columns:1fr 1fr}
+  .mode-picker{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -216,11 +251,11 @@ h1 span{color:var(--green)}
 <header>
   <div class="logo-icon">📄</div>
   <div>
-    <div class="logo-title">SKILLECT.AI</div>
+    <div class="logo-title">RESUME.AI</div>
     <div class="logo-sub">CAREER INTELLIGENCE ENGINE</div>
   </div>
   <div class="header-right">
-    <div class="powered">MULTI-AI POWERED</div>
+    <div class="powered">6 AI MODELS</div>
     <label class="switch" title="Toggle theme">
       <input type="checkbox" id="toggle-input" onchange="toggleTheme(this)">
       <span class="slider round">
@@ -250,35 +285,190 @@ h1 span{color:var(--green)}
 </header>
 
 <main>
-  <!-- UPLOAD -->
+  <!-- UPLOAD / HOME -->
   <div id="upload-section">
     <h1>Unlock Your Career's<br><span>Full Potential</span></h1>
-    <p class="subtitle">Upload your resume. Get AI-powered analysis, skill gaps, cover letters, resume rewrites &amp; more.</p>
-    <div id="dropzone" onclick="document.getElementById('file-input').click()">
-      <div class="dz-icon" id="dz-icon">📂</div>
-      <div class="dz-text" id="dz-text">Drop your resume here or click to browse</div>
-      <div class="dz-hint">Supports PDF and TXT files</div>
+    <p class="subtitle">Analyze an existing resume — or build a brand new one from scratch with AI.</p>
+
+    <!-- MODE PICKER -->
+    <div class="mode-picker" id="mode-picker">
+      <div class="mode-card active" id="mode-upload-card" onclick="setMode('upload')">
+        <span class="mode-icon">📂</span>
+        <div class="mode-title">ANALYZE RESUME</div>
+        <div class="mode-desc">Upload an existing PDF or TXT resume. Get scores, skill gaps, fixes &amp; more.</div>
+      </div>
+      <div class="mode-card" id="mode-scratch-card" onclick="setMode('scratch')">
+        <span class="mode-icon">✍️</span>
+        <div class="mode-title">BUILD FROM SCRATCH</div>
+        <div class="mode-desc">No resume yet? Fill in your details and let AI write &amp; analyze your resume for you.</div>
+        <span class="mode-badge blue">NEW</span>
+      </div>
     </div>
-    <input type="file" id="file-input" accept=".pdf,.txt"/>
-    <div class="provider-bar">
-      <span class="provider-label">AI MODEL:</span>
-      <select class="provider-select" id="provider-select">
-        <option value="claude">🤖 Claude (Anthropic)</option>
-        <option value="mistral">🌊 Mistral Small</option>
-        <option value="groq">⚡ Llama 3.3 70B (Groq)</option>
-        <option value="cohere">🧠 Command R+ (Cohere)</option>
-        <option value="openrouter">🔀 Llama 3.3 (OpenRouter)</option>
-        <option value="together">🤝 Llama 3.3 (Together AI)</option>
-      </select>
-      <button class="panel-btn" id="panel-btn" onclick="togglePanel()">
-        ⚖️ Judge Panel <span class="panel-badge" id="panel-badge" style="display:none">ON</span>
-      </button>
+
+    <!-- UPLOAD PANEL -->
+    <div id="upload-panel">
+      <div id="dropzone" onclick="document.getElementById('file-input').click()">
+        <div class="dz-icon" id="dz-icon">📂</div>
+        <div class="dz-text" id="dz-text">Drop your resume here or click to browse</div>
+        <div class="dz-hint">Supports PDF and TXT files</div>
+      </div>
+      <input type="file" id="file-input" accept=".pdf,.txt"/>
+      <div class="provider-bar">
+        <span class="provider-label">AI MODEL:</span>
+        <select class="provider-select" id="provider-select">
+          <option value="claude">🤖 Claude (Anthropic)</option>
+          <option value="mistral">🌊 Mistral Small</option>
+          <option value="groq">⚡ Llama 3.3 70B (Groq)</option>
+          <option value="cohere">🧠 Command R+ (Cohere)</option>
+          <option value="openrouter">🔀 Llama 3.3 (OpenRouter)</option>
+          <option value="together">🤝 Llama 3.3 (Together AI)</option>
+        </select>
+        <button class="panel-btn" id="panel-btn" onclick="togglePanel()">
+          ⚖️ Judge Panel <span class="panel-badge" id="panel-badge" style="display:none">ON</span>
+        </button>
+      </div>
+      <div id="error" class="error"></div>
+      <button id="analyze-btn" onclick="analyzeResume()">ANALYZE RESUME →</button>
+      <div id="loader">
+        <p>⚙️ Running career intelligence analysis...</p>
+        <div class="loader-bar"><div class="loader-fill"></div></div>
+      </div>
     </div>
-    <div id="error" class="error"></div>
-    <button id="analyze-btn" onclick="analyzeResume()">ANALYZE RESUME →</button>
-    <div id="loader">
-      <p>⚙️ Running career intelligence analysis...</p>
-      <div class="loader-bar"><div class="loader-fill"></div></div>
+
+    <!-- SCRATCH PANEL -->
+    <div id="scratch-section">
+      <button class="scratch-back" onclick="setMode('upload')">← Back to upload</button>
+      <div class="scratch-header">
+        <h2>✍️ Build Your Resume</h2>
+        <p>Fill in your details below. AI will write and analyze your resume instantly.</p>
+      </div>
+
+      <!-- STEP 1: PERSONAL INFO -->
+      <div class="scratch-step">
+        <div class="scratch-step-label"><span class="scratch-step-num">1</span> PERSONAL INFO</div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label class="form-label">FULL NAME *</label>
+            <input type="text" class="form-input" id="sc-name" placeholder="e.g. Priya Sharma">
+          </div>
+          <div class="form-field">
+            <label class="form-label">TARGET ROLE *</label>
+            <input type="text" class="form-input" id="sc-role" placeholder="e.g. Software Engineer">
+          </div>
+          <div class="form-field">
+            <label class="form-label">EMAIL</label>
+            <input type="text" class="form-input" id="sc-email" placeholder="you@email.com">
+          </div>
+          <div class="form-field">
+            <label class="form-label">LOCATION</label>
+            <input type="text" class="form-input" id="sc-location" placeholder="e.g. Bangalore, India">
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">PROFESSIONAL SUMMARY (optional)</label>
+          <textarea class="form-textarea" id="sc-summary" style="min-height:80px" placeholder="Brief overview of who you are and what you bring..."></textarea>
+        </div>
+      </div>
+
+      <!-- STEP 2: EXPERIENCE -->
+      <div class="scratch-step">
+        <div class="scratch-step-label"><span class="scratch-step-num">2</span> WORK EXPERIENCE</div>
+        <div id="exp-entries">
+          <div class="exp-entry" id="exp-0">
+            <div class="form-grid">
+              <div class="form-field" style="margin-bottom:8px">
+                <label class="form-label">JOB TITLE</label>
+                <input type="text" class="form-input exp-title" placeholder="e.g. Software Engineer">
+              </div>
+              <div class="form-field" style="margin-bottom:8px">
+                <label class="form-label">COMPANY</label>
+                <input type="text" class="form-input exp-company" placeholder="e.g. TCS">
+              </div>
+              <div class="form-field" style="margin-bottom:8px">
+                <label class="form-label">DURATION</label>
+                <input type="text" class="form-input exp-duration" placeholder="e.g. Jun 2022 – Present">
+              </div>
+              <div class="form-field" style="margin-bottom:8px">
+                <label class="form-label">LOCATION</label>
+                <input type="text" class="form-input exp-loc" placeholder="e.g. Remote">
+              </div>
+            </div>
+            <div class="form-field" style="margin-bottom:0">
+              <label class="form-label">KEY ACHIEVEMENTS / RESPONSIBILITIES</label>
+              <textarea class="form-textarea exp-desc" style="min-height:80px" placeholder="Describe what you did, built, or achieved. Include numbers if possible."></textarea>
+            </div>
+          </div>
+        </div>
+        <button class="add-entry-btn" onclick="addExpEntry()">+ Add Another Role</button>
+      </div>
+
+      <!-- STEP 3: EDUCATION -->
+      <div class="scratch-step">
+        <div class="scratch-step-label"><span class="scratch-step-num">3</span> EDUCATION</div>
+        <div id="edu-entries">
+          <div class="exp-entry" id="edu-0">
+            <div class="form-grid">
+              <div class="form-field" style="margin-bottom:8px">
+                <label class="form-label">DEGREE / QUALIFICATION</label>
+                <input type="text" class="form-input edu-degree" placeholder="e.g. B.Tech Computer Science">
+              </div>
+              <div class="form-field" style="margin-bottom:8px">
+                <label class="form-label">INSTITUTION</label>
+                <input type="text" class="form-input edu-school" placeholder="e.g. IIT Delhi">
+              </div>
+              <div class="form-field" style="margin-bottom:0">
+                <label class="form-label">YEAR</label>
+                <input type="text" class="form-input edu-year" placeholder="e.g. 2018 – 2022">
+              </div>
+              <div class="form-field" style="margin-bottom:0">
+                <label class="form-label">GRADE / GPA (optional)</label>
+                <input type="text" class="form-input edu-grade" placeholder="e.g. 8.4 CGPA">
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="add-entry-btn" onclick="addEduEntry()">+ Add Another Degree</button>
+      </div>
+
+      <!-- STEP 4: SKILLS & EXTRAS -->
+      <div class="scratch-step">
+        <div class="scratch-step-label"><span class="scratch-step-num">4</span> SKILLS &amp; EXTRAS</div>
+        <div class="form-field">
+          <label class="form-label">TECHNICAL SKILLS</label>
+          <input type="text" class="form-input" id="sc-skills" placeholder="e.g. Python, React, SQL, AWS, Figma">
+        </div>
+        <div class="form-field">
+          <label class="form-label">CERTIFICATIONS (optional)</label>
+          <input type="text" class="form-input" id="sc-certs" placeholder="e.g. AWS Solutions Architect, Google Analytics">
+        </div>
+        <div class="form-field">
+          <label class="form-label">PROJECTS (optional)</label>
+          <textarea class="form-textarea" id="sc-projects" style="min-height:80px" placeholder="Notable projects with tech stack and outcomes..."></textarea>
+        </div>
+        <div class="form-field" style="margin-bottom:0">
+          <label class="form-label">LANGUAGES / OTHER (optional)</label>
+          <input type="text" class="form-input" id="sc-other" placeholder="e.g. Hindi (native), English (fluent), French (basic)">
+        </div>
+      </div>
+
+      <!-- PROVIDER + SUBMIT -->
+      <div class="provider-bar" style="max-width:100%;justify-content:flex-start;margin-bottom:12px">
+        <span class="provider-label">AI MODEL:</span>
+        <select class="provider-select" id="scratch-provider-select">
+          <option value="claude">🤖 Claude (Anthropic)</option>
+          <option value="mistral">🌊 Mistral Small</option>
+          <option value="groq">⚡ Llama 3.3 70B (Groq)</option>
+          <option value="cohere">🧠 Command R+ (Cohere)</option>
+          <option value="openrouter">🔀 Llama 3.3 (OpenRouter)</option>
+          <option value="together">🤝 Llama 3.3 (Together AI)</option>
+        </select>
+      </div>
+      <div id="scratch-error" class="error" style="max-width:100%"></div>
+      <button id="scratch-analyze-btn" onclick="analyzeFromScratch()">✨ BUILD &amp; ANALYZE RESUME →</button>
+      <div id="scratch-loader" style="display:none;margin-top:24px;text-align:center">
+        <p style="color:var(--muted);font-size:12px;margin-bottom:10px">⚙️ Writing and analyzing your resume...</p>
+        <div class="loader-bar" style="margin:0 auto"><div class="loader-fill"></div></div>
+      </div>
     </div>
   </div>
 
@@ -767,7 +957,7 @@ function exportPDFReport() {
     y+=2;
   };
   const addSection = t => { y+=4; addText(t,13,true); doc.setDrawColor(0,229,160); doc.line(20,y,190,y); y+=6; };
-  addText('SKILLECT.AI — Career Analysis Report', 18, true);
+  addText('RESUME.AI — Career Analysis Report', 18, true);
   addText('Generated: ' + new Date().toLocaleDateString(), 9); y+=4;
   addText(a.name||'Unknown', 14, true);
   addText(a.currentRole||'', 11);
@@ -805,7 +995,184 @@ function resetApp() {
   document.getElementById('cl-toolbar').style.display = 'none';
   document.getElementById('rg-result').style.display = 'none';
   document.getElementById('panel-status').style.display = 'none';
+  setMode('upload');
   switchTab('improvements', document.querySelector('.tab-btn'));
+}
+
+// MODE SWITCHER
+let currentMode = 'upload';
+function setMode(mode) {
+  currentMode = mode;
+  const uploadCard = document.getElementById('mode-upload-card');
+  const scratchCard = document.getElementById('mode-scratch-card');
+  const uploadPanel = document.getElementById('upload-panel');
+  const scratchPanel = document.getElementById('scratch-section');
+  if (mode === 'upload') {
+    uploadCard.classList.add('active'); uploadCard.classList.remove('active-blue');
+    scratchCard.classList.remove('active','active-blue');
+    uploadPanel.style.display = 'block';
+    scratchPanel.style.display = 'none';
+  } else {
+    scratchCard.classList.add('active-blue'); scratchCard.classList.remove('active');
+    uploadCard.classList.remove('active','active-blue');
+    uploadPanel.style.display = 'none';
+    scratchPanel.style.display = 'block';
+    checkScratchReady();
+  }
+}
+
+// SCRATCH: add/remove entries
+let expCount = 1, eduCount = 1;
+function addExpEntry() {
+  const id = 'exp-' + expCount++;
+  const div = document.createElement('div');
+  div.className = 'exp-entry'; div.id = id;
+  div.innerHTML = `
+    <button class="exp-remove" onclick="this.parentElement.remove()">✕</button>
+    <div class="form-grid">
+      <div class="form-field" style="margin-bottom:8px"><label class="form-label">JOB TITLE</label><input type="text" class="form-input exp-title" placeholder="e.g. Data Analyst"></div>
+      <div class="form-field" style="margin-bottom:8px"><label class="form-label">COMPANY</label><input type="text" class="form-input exp-company" placeholder="e.g. Infosys"></div>
+      <div class="form-field" style="margin-bottom:8px"><label class="form-label">DURATION</label><input type="text" class="form-input exp-duration" placeholder="e.g. Jan 2020 – May 2022"></div>
+      <div class="form-field" style="margin-bottom:8px"><label class="form-label">LOCATION</label><input type="text" class="form-input exp-loc" placeholder="e.g. Mumbai"></div>
+    </div>
+    <div class="form-field" style="margin-bottom:0"><label class="form-label">KEY ACHIEVEMENTS / RESPONSIBILITIES</label>
+      <textarea class="form-textarea exp-desc" style="min-height:80px" placeholder="Describe what you did, built, or achieved..."></textarea></div>`;
+  document.getElementById('exp-entries').appendChild(div);
+}
+function addEduEntry() {
+  const id = 'edu-' + eduCount++;
+  const div = document.createElement('div');
+  div.className = 'exp-entry'; div.id = id;
+  div.innerHTML = `
+    <button class="exp-remove" onclick="this.parentElement.remove()">✕</button>
+    <div class="form-grid">
+      <div class="form-field" style="margin-bottom:0"><label class="form-label">DEGREE</label><input type="text" class="form-input edu-degree" placeholder="e.g. MBA"></div>
+      <div class="form-field" style="margin-bottom:0"><label class="form-label">INSTITUTION</label><input type="text" class="form-input edu-school" placeholder="e.g. IIM Ahmedabad"></div>
+      <div class="form-field" style="margin-bottom:0"><label class="form-label">YEAR</label><input type="text" class="form-input edu-year" placeholder="e.g. 2022 – 2024"></div>
+      <div class="form-field" style="margin-bottom:0"><label class="form-label">GRADE (optional)</label><input type="text" class="form-input edu-grade" placeholder="e.g. 9.1 CGPA"></div>
+    </div>`;
+  document.getElementById('edu-entries').appendChild(div);
+}
+
+// Watch required fields to enable button
+function checkScratchReady() {
+  const name = document.getElementById('sc-name').value.trim();
+  const role = document.getElementById('sc-role').value.trim();
+  const btn = document.getElementById('scratch-analyze-btn');
+  if (name && role) btn.classList.add('ready');
+  else btn.classList.remove('ready');
+}
+document.addEventListener('input', e => {
+  if (e.target.id === 'sc-name' || e.target.id === 'sc-role') checkScratchReady();
+});
+
+// BUILD RESUME TEXT FROM FORM
+function buildResumeText() {
+  const name = document.getElementById('sc-name').value.trim();
+  const role = document.getElementById('sc-role').value.trim();
+  const email = document.getElementById('sc-email').value.trim();
+  const location = document.getElementById('sc-location').value.trim();
+  const summary = document.getElementById('sc-summary').value.trim();
+  const skills = document.getElementById('sc-skills').value.trim();
+  const certs = document.getElementById('sc-certs').value.trim();
+  const projects = document.getElementById('sc-projects').value.trim();
+  const other = document.getElementById('sc-other').value.trim();
+
+  const experiences = [...document.querySelectorAll('#exp-entries .exp-entry')].map(el => ({
+    title: el.querySelector('.exp-title')?.value.trim() || '',
+    company: el.querySelector('.exp-company')?.value.trim() || '',
+    duration: el.querySelector('.exp-duration')?.value.trim() || '',
+    loc: el.querySelector('.exp-loc')?.value.trim() || '',
+    desc: el.querySelector('.exp-desc')?.value.trim() || '',
+  })).filter(e => e.title || e.company || e.desc);
+
+  const educations = [...document.querySelectorAll('#edu-entries .exp-entry')].map(el => ({
+    degree: el.querySelector('.edu-degree')?.value.trim() || '',
+    school: el.querySelector('.edu-school')?.value.trim() || '',
+    year: el.querySelector('.edu-year')?.value.trim() || '',
+    grade: el.querySelector('.edu-grade')?.value.trim() || '',
+  })).filter(e => e.degree || e.school);
+
+  let text = `Name: ${name}\nTarget Role: ${role}\n`;
+  if (email) text += `Email: ${email}\n`;
+  if (location) text += `Location: ${location}\n`;
+  if (summary) text += `\nSummary:\n${summary}\n`;
+
+  if (experiences.length) {
+    text += `\nWork Experience:\n`;
+    experiences.forEach(e => {
+      text += `\n${e.title}${e.company ? ' at ' + e.company : ''}${e.duration ? ' | ' + e.duration : ''}${e.loc ? ' | ' + e.loc : ''}\n`;
+      if (e.desc) text += e.desc + '\n';
+    });
+  }
+
+  if (educations.length) {
+    text += `\nEducation:\n`;
+    educations.forEach(e => {
+      text += `${e.degree}${e.school ? ' — ' + e.school : ''}${e.year ? ' (' + e.year + ')' : ''}${e.grade ? ' | ' + e.grade : ''}\n`;
+    });
+  }
+
+  if (skills) text += `\nSkills: ${skills}\n`;
+  if (certs) text += `Certifications: ${certs}\n`;
+  if (projects) text += `\nProjects:\n${projects}\n`;
+  if (other) text += `\nOther: ${other}\n`;
+
+  return text;
+}
+
+// ANALYZE FROM SCRATCH
+async function analyzeFromScratch() {
+  const name = document.getElementById('sc-name').value.trim();
+  const role = document.getElementById('sc-role').value.trim();
+  const errEl = document.getElementById('scratch-error');
+  errEl.style.display = 'none';
+  if (!name || !role) { errEl.textContent = 'Please fill in at least your name and target role.'; errEl.style.display = 'block'; return; }
+
+  const btn = document.getElementById('scratch-analyze-btn');
+  if (!btn.classList.contains('ready')) return;
+  btn.textContent = '⚙️ BUILDING & ANALYZING...'; btn.classList.remove('ready');
+  document.getElementById('scratch-loader').style.display = 'block';
+
+  const resumeText = buildResumeText();
+  const provider = document.getElementById('scratch-provider-select').value;
+
+  // First pass: AI writes a polished resume from the raw data
+  const writeSystem = `You are an expert resume writer. The user has provided raw career details. Write a complete, polished, professional resume from this data. Return ONLY the resume as plain text — no JSON, no markdown headers. Include sections: Contact, Summary, Experience, Education, Skills, and any other relevant sections. Make achievements specific and impactful.`;
+
+  try {
+    const writeData = await callAPI({ provider, panel: false, max_tokens: 3000, system: writeSystem, messages: [{ role: 'user', content: `Here are my career details:\n\n${resumeText}\n\nPlease write a complete professional resume.` }] });
+    const polishedResume = (writeData.result || '').trim();
+
+    // Second pass: analyze the written resume
+    const messages = [{ role: 'user', content: `Resume:\n\n${polishedResume}\n\nAnalyze and return the JSON.` }];
+    const analyzeData = await callAPI({ provider, panel: false, max_tokens: 4000, system: SYSTEM_PROMPT, messages });
+    const analysis = JSON.parse((analyzeData.result || '').replace(/```json|```/g, '').trim());
+
+    // Store polished resume so Resume Generator tab can pre-populate it
+    lastAnalysis = analysis;
+    lastAnalysis._scratchResume = polishedResume;
+    lastAnalysis._scratchName = name;
+    lastAnalysis._scratchRole = role;
+
+    renderResults(analysis);
+
+    // Pre-populate Resume Generator with the written resume
+    document.getElementById('rg-jobtitle').value = role;
+    // Show the generated resume in rg-output as a starting point
+    document.getElementById('rg-output').textContent = polishedResume;
+    document.getElementById('rg-result-title').innerHTML = '✨ YOUR AI-WRITTEN RESUME';
+    document.getElementById('rg-result').style.display = 'block';
+    document.getElementById('rg-toolbar').style.display = 'flex';
+
+  } catch (err) {
+    errEl.textContent = 'Failed: ' + err.message;
+    errEl.style.display = 'block';
+    btn.textContent = '✨ BUILD & ANALYZE RESUME →';
+    btn.classList.add('ready');
+  } finally {
+    document.getElementById('scratch-loader').style.display = 'none';
+  }
 }
 </script>
 </body>
