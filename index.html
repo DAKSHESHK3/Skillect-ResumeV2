@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Resume.AI — Career Intelligence Engine</title>
+<title>SKILLECT.AI — Career Intelligence Engine</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -216,7 +216,7 @@ h1 span{color:var(--green)}
 <header>
   <div class="logo-icon">📄</div>
   <div>
-    <div class="logo-title">RESUME.AI</div>
+    <div class="logo-title">SKILLECT.AI</div>
     <div class="logo-sub">CAREER INTELLIGENCE ENGINE</div>
   </div>
   <div class="header-right">
@@ -767,7 +767,7 @@ function exportPDFReport() {
     y+=2;
   };
   const addSection = t => { y+=4; addText(t,13,true); doc.setDrawColor(0,229,160); doc.line(20,y,190,y); y+=6; };
-  addText('RESUME.AI — Career Analysis Report', 18, true);
+  addText('SKILLECT.AI — Career Analysis Report', 18, true);
   addText('Generated: ' + new Date().toLocaleDateString(), 9); y+=4;
   addText(a.name||'Unknown', 14, true);
   addText(a.currentRole||'', 11);

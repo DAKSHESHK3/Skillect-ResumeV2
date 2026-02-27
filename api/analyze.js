@@ -1,4 +1,4 @@
-// Resume.AI — Multi-provider API proxy
+// SKILLECT.AI — Multi-provider API proxy
 // Providers: Claude, Mistral, Groq, Cohere, OpenRouter, Together AI
 
 const PROVIDERS = {
@@ -89,7 +89,7 @@ const PROVIDERS = {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`,
           'HTTP-Referer': 'https://resume-ai.vercel.app',
-          'X-Title': 'Resume.AI',
+          'X-Title': 'SKILLECT.AI',
         },
         body: JSON.stringify({
           model: 'meta-llama/llama-3.3-70b-instruct:free',
